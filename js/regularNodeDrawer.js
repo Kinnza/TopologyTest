@@ -3,9 +3,18 @@
  */
 
 var regularNodeDrawer = {
+    minNodeWidth: 140,
+    minNodeHeight: 100,
+    "maxTextLength" : 100,
+    "contentOffsetLeft" : 15,
+    "contentOffsetTop" : 35,
+    "contentOffsetRight" : 10,
+    "contentOffsetBottom" : 10,
+
     draw: function (selection) {
 
         var circleRadius = 15;
+        var thi$ = this;
 
 //        selection
 //            .append("svg:rect")
@@ -19,7 +28,7 @@ var regularNodeDrawer = {
             .append("svg:rect")
             .attr('class','nodeRect nodeObject')
             .attr("width", function(d) { return d.width - 10})
-            .attr("height",function(d) { return d.height - 20})
+            .attr("height",function(d) { return d.height - 10})
             //.style("stroke-linejoin", "round")
             .style("fill", function(d) {return 'rgb(225, 232, 236)';})
             .attr('rx','5')
@@ -42,7 +51,7 @@ var regularNodeDrawer = {
             .attr('y',circleRadius + 5)
             .text(function(d) { return d.name + "("+ d.type +" )"; })
             .text(function(d){
-                return utils.limitTextLength(this,topologyConfig[d.type].maxTextLength);
+                return utils.limitTextLength(this,thi$.maxTextLength);
             });
     }
 }

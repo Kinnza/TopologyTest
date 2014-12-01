@@ -8,6 +8,8 @@ var drawers = {
     vm : regularNodeDrawer
 }
 
+var gap = 10;
+
 var topology = {
     init: function() {
         this.svgWidth = $('#topologyContainer').innerWidth()-5;
@@ -148,17 +150,15 @@ var topology = {
     },
 
     _calcNodeSizes_inner: function (node,parent) {
+        // If its the last node in the leaf use the default width
         if (!node.nodes || node.nodes.length == 0) {
-            node.width = topologyConfig[node.type].nodeWidth;
-            node.height = topologyConfig[node.type].nodeHeight;
-            var bufferTop = 0;
-            var bufferLeft = 0;
-            if (parent != null) {
-                bufferTop = topologyConfig[parent.type].contentOffsetY || 0;
-                bufferLeft = topologyConfig[parent.type].contentOffsetX || 0;
-            }
-            node.bufferTop = bufferTop;
-            node.bufferLeft = bufferLeft;
+            node.width = drawers[node.type].minNodeWidth;
+            node.height = drawers[node.type].minNodeHeight;
+
+            this._setNodeBuffers(node,parent);
+
+            node.totalWidth = node.width + node.bufferLeft + node.bufferRight;
+            node.totalHeight = node.height + node.bufferTop + node.bufferBottom;
 
         } else {
             var thi$ = this;
@@ -168,28 +168,38 @@ var topology = {
             _.each(node.nodes, function (child) {
                 thi$._calcNodeSizes_inner(child,node);
 
-                var currClientTotalHeight = child.height + topologyConfig.gap + child.bufferTop;
-                var currClientTotalWidth = child.width + topologyConfig.gap + child.bufferLeft;
+                var currClientTotalHeight = child.totalHeight;
+                var currClientTotalWidth = child.totalWidth + gap;
                 if (currClientTotalHeight > maxChildHeight) {
                     maxChildHeight = currClientTotalHeight;
                 }
                 childsWidth += currClientTotalWidth;
-                //childsHeight += child.height + topologyConfig.gap;
             });
-            var bufferTop = 0;
-            var bufferLeft = 0;
-            if (parent != null) {
-                bufferTop = topologyConfig[parent.type].contentOffsetY || 0;
-                bufferLeft = topologyConfig[parent.type].contentOffsetX || 0;
-            }
-            node.width = topologyConfig[node.type].nodeWidth > childsWidth + topologyConfig.gap ? topologyConfig[node.type].nodeWidth : childsWidth + topologyConfig.gap ;
-            node.height = topologyConfig[node.type].nodeHeight > maxChildHeight  + topologyConfig.gap ? topologyConfig[node.type].nodeHeight : maxChildHeight  + topologyConfig.gap ;
-            node.bufferTop = bufferTop;
-            node.bufferLeft = bufferLeft;
+
+            thi$._setNodeBuffers(node,parent);
+
+            node.width = drawers[node.type].minNodeWidth > childsWidth ? drawers[node.type].minNodeWidth : childsWidth ;
+            node.height = drawers[node.type].minNodeHeight> maxChildHeight ? drawers[node.type].minNodeHeight : maxChildHeight ;
+            node.totalWidth = node.width + node.bufferLeft + node.bufferRight;
+            node.totalHeight = node.height + node.bufferTop + node.bufferBottom;
 
         }
     },
 
+    _setNodeBuffers: function(node, parent){
+        // Calc the buffer according to the parent
+        if (parent != null) {
+            node.bufferTop =drawers[parent.type].contentOffsetTop || 0;
+            node.bufferLeft = drawers[parent.type].contentOffsetLeft || 0;
+            node.bufferBottom = drawers[parent.type].contentOffsetBottom || 0;
+            node.bufferRight = drawers[parent.type].contentOffsetRight || 0;
+        } else {
+            node.bufferTop = 0;
+            node.bufferLeft = 0
+            node.bufferBottom = 0;
+            node.bufferRight = 0
+        }
+    },
     _placeNodes : function() {
         var startX = 20;
         var startY = 20 ;
@@ -212,18 +222,18 @@ var topology = {
         _.each (nodes, function(node){
             if (topLevel && x> thi$.maxWidth) {
                 x = initialX;
-                y = y + maxRowHeight + topologyConfig.gap;
+                y = y + maxRowHeight + gap;
             }
 
             node.xLoc = x + node.bufferLeft;
             node.yLoc = y + node.bufferTop;
 
-            thi$._placeNodesInner(node.nodes,node.xLoc + topologyConfig.gap, node.yLoc);
+            thi$._placeNodesInner(node.nodes,node.xLoc + gap, node.yLoc);
 
             if (maxRowHeight < (node.height + node.bufferTop)) {
                 maxRowHeight = node.height + node.bufferTop;
             }
-            x += node.width +node.bufferLeft + topologyConfig.gap;
+            x += node.width +node.bufferLeft + gap;
         });
 
     }

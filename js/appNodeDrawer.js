@@ -3,8 +3,17 @@
  */
 
 var appNodeDrawer = {
+    minNodeWidth: 55,
+    minNodeHeight: 70,
+    "maxTextLength" : 55,
+    "contentOffsetLeft" : 0,
+    "contentOffsetTop" : 0,
+    "contentOffsetRight" : 0,
+    "contentOffsetBottom" : 0,
+
     draw: function (selection) {
-        var circleRadius = (topologyConfig.app.nodeWidth - 20) / 2;
+        var thi$ = this;
+        var circleRadius = (this.minNodeWidth - 20) / 2;
         selection
             .append("svg:circle")
             .attr('class','nodeRect nodeObject')
@@ -19,7 +28,7 @@ var appNodeDrawer = {
             .attr('y',function(d) { return circleRadius*2 + 15} )
             .text(function(d) { return d.name; })
             .text(function(d){
-                return utils.limitTextLength(this,topologyConfig[d.type].maxTextLength);
+                return utils.limitTextLength(this,thi$.maxTextLength);
             });
 
     }

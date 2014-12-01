@@ -1,0 +1,23 @@
+#topologyContainer {
+    width: 800px;
+    height: 400px;
+    margin: 0 auto;
+    border: 1px solid black;
+}
+.nodeRect {
+    stroke: black;
+}
+
+.nodeContainer .title {
+    font-size: 13px;
+    font-family: sans-serif;
+
+}
+
+.nodeContainer.app .title {
+    font-size: 11px;
+}
+
+.nodeContainer .icon {
+    stroke: blue;
+}
